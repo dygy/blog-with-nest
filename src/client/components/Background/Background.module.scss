@@ -1,11 +1,23 @@
-.background {
-    position: absolute;
+@mixin back {
     display: flex;
     flex-direction: column;
     justify-content: left;
     align-content: center;
     padding: 16px;
+    width: calc(100vw - 32px);
+    height: calc(100vh - 32px);
+}
+
+.background {
+    @include back;
     background-color: burlywood;
-    width: calc(100% - 32px);
-    height: calc(100% - 32px);
+}
+
+.backgroundDark {
+    @include back;
+    color: white;
+    background-color: #383737;
+    a {
+       color: papayawhip;
+    }
 }

@@ -3,6 +3,7 @@ import { buildServerSideProps } from 'src/client/ssr/buildServerSideProps';
 import { BlogPost } from 'src/shared/types/blog-post';
 import { fetch } from 'src/shared/utils/fetch';
 import { useMemo } from 'react';
+import Background from '../client/components/Background/Background';
 
 declare type blogProps = {
   post: BlogPost;
@@ -21,10 +22,10 @@ const Id = ({ post }: blogProps) => {
     }
   }, [post.id]);
   return (
-    <div>
+    <Background>
       <Link href={'/'}>Home</Link>
       {title}
-    </div>
+    </Background>
   );
 };
 
