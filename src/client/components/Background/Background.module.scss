@@ -1,23 +1,23 @@
+@import '../../../theme-variables.scss';
+
 @mixin back {
     display: flex;
     flex-direction: column;
     justify-content: left;
     align-content: center;
-    padding: 16px;
-    width: calc(100vw - 32px);
-    height: calc(100vh - 32px);
+    padding: 32px;
+    width: 100vw;
+    height: calc(100vh - 188px);
+    box-sizing: border-box;
 }
 
 .background {
     @include back;
-    background-color: burlywood;
-}
-
-.backgroundDark {
-    @include back;
-    color: white;
-    background-color: #383737;
-    a {
-       color: papayawhip;
+    @include themify() {
+        background: themed('bodyBackgroundColor');
+        color: themed('textColor');
+        a {
+            color: themed('textColor');
+        }
     }
 }

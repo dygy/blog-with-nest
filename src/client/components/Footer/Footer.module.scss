@@ -1,0 +1,17 @@
+@import '../../../theme-variables.scss';
+
+.footer {
+  width: 100%;
+  z-index: 99;
+  height: 78px;
+  display: flex;
+  @include themify() {
+    background: themed('headerFooterBackground');
+    color: themed('textColor');
+  }
+  .footerContent {
+    text-align: center;
+    max-width: 1200px;
+    margin: auto;
+  }
+}

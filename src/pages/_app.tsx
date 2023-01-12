@@ -2,7 +2,8 @@ import NextApp, { AppProps } from 'next/app';
 import { AppDataContext } from 'src/client/ssr/appData';
 import { AppData } from 'src/shared/types/app-data';
 import { initializeFetch } from 'src/shared/utils/fetch';
-import '../global.css';
+import React from 'react';
+import '../global.scss';
 class App extends NextApp<AppProps> {
   appData: AppData;
 
@@ -20,9 +21,11 @@ class App extends NextApp<AppProps> {
     const { Component, pageProps } = this.props;
 
     return (
-      <AppDataContext.Provider value={this.appData}>
-        <Component {...pageProps} />
-      </AppDataContext.Provider>
+      <React.StrictMode>
+        <AppDataContext.Provider value={this.appData}>
+          <Component {...pageProps} />
+        </AppDataContext.Provider>
+      </React.StrictMode>
     );
   }
 }

@@ -1,19 +1,44 @@
-import React from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import * as style from './Background.module.scss';
-import useTheme, { themes } from '../../hooks/useTheme';
+import Header from '../Header/Header';
+import { ThemeContext } from '../../context/theme-context';
+import Footer from '../Footer/Footer';
 
 declare type backgroundProps = {
   children: React.ReactNode;
 };
 export default ({ children }: backgroundProps) => {
-  const { theme } = useTheme();
+  const [isLoading, setLoading] = useState(true);
+  const isBrowserDefaultDark = useCallback(() => {
+    if (typeof window !== 'undefined') {
+      return window?.matchMedia('(prefers-color-scheme: dark)').matches;
+    }
+  }, []);
+
+  const getDefaultTheme = useCallback(() => {
+    let localStorageTheme = 'light';
+    if (typeof window !== 'undefined') {
+      // Perform localStorage action
+      localStorageTheme = localStorage.getItem('default-theme') || 'light';
+    }
+
+    const browserDefault = isBrowserDefaultDark() ? 'dark' : 'light';
+    return localStorageTheme || browserDefault;
+  }, []);
+
+  const [theme, setTheme] = useState('light');
+  useEffect(() => {
+    setTheme(getDefaultTheme());
+    setLoading(false);
+  }, []);
+
   return (
-    <div
-      className={
-        theme === themes.dark ? style.backgroundDark : style.background
-      }
-    >
-      {children}
-    </div>
+    <ThemeContext.Provider value={{ theme, setTheme }}>
+      <div className={`theme-${theme}`}>
+        <Header isLoading={isLoading} />
+        <div className={style.background}>{children}</div>
+        <Footer />
+      </div>
+    </ThemeContext.Provider>
   );
 };
