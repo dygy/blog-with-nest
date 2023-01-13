@@ -1,11 +1,4 @@
-import {
-  Controller,
-  Get,
-  Param,
-  ParseIntPipe,
-  Render,
-  UseInterceptors,
-} from '@nestjs/common';
+import { Controller, Get, Render, UseInterceptors } from '@nestjs/common';
 import { AppService } from './app.service';
 import { ParamsInterceptor } from './params.interceptor';
 import { ConfigInterceptor } from './config.interceptor';
@@ -26,16 +19,5 @@ export class AppController {
   @UseInterceptors(ParamsInterceptor, ConfigInterceptor)
   public blogPost() {
     return {};
-  }
-
-  @Get('/api/blog-posts')
-  public listBlogPosts() {
-    return this.appService.getBlogPosts();
-  }
-
-  @Get('/api/blog-posts/:id')
-  public getBlogPostById(@Param('id', new ParseIntPipe()) id: number) {
-    console.log(id);
-    return this.appService.getBlogPost(id);
   }
 }

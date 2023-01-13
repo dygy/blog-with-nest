@@ -1,12 +1,12 @@
 import Link from 'next/link';
 import { useFeature } from 'src/client/hooks/useFeatures';
 import { buildServerSideProps } from 'src/client/ssr/buildServerSideProps';
-import { BlogPost } from 'src/shared/types/blog-post';
+import { Blog } from 'src/shared/types/blog-post';
 import { fetch } from 'src/shared/utils/fetch';
 import Background from '../client/components/Background/Background';
 
 type homeProps = {
-  blogPosts: BlogPost[];
+  blogPosts: Blog[];
 };
 
 const Home = ({ blogPosts }: homeProps) => {
@@ -15,15 +15,17 @@ const Home = ({ blogPosts }: homeProps) => {
   return (
     <Background>
       <h1>Home</h1>
-      {blogPosts.map(({ title, id }) => (
-        <div key={id}>
+      {blogPosts.map(({ name, _id }, id) => (
+        <div key={_id}>
           {linkFeature ? (
             <>
-              {title}
-              <Link href={`/${id}`}> Link</Link>
+              <span>
+                {id + 1}. {name}{' '}
+              </span>
+              <Link href={`/${_id}`}>Link</Link>
             </>
           ) : (
-            <Link href={`/${id}`}>{title}</Link>
+            <Link href={`/${_id}`}>{name}</Link>
           )}
         </div>
       ))}
@@ -32,7 +34,7 @@ const Home = ({ blogPosts }: homeProps) => {
 };
 
 export const getServerSideProps = buildServerSideProps<homeProps>(async () => {
-  const blogPosts = await fetch('/api/blog-posts');
+  const blogPosts = (await fetch('/blogs/blog-posts')) || [];
 
   return { blogPosts };
 });

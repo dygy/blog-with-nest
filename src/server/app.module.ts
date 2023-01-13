@@ -4,6 +4,7 @@ import { RenderModule } from 'nest-next';
 import { NODE_ENV } from 'src/shared/constants/env';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { BlogsModule } from './blog/blogs.module';
 
 declare const module: any;
 
@@ -22,9 +23,11 @@ export class AppModule {
       });
     }
 
+    BlogsModule.initialize();
+
     return {
       module: AppModule,
-      imports: [renderModule],
+      imports: [renderModule, BlogsModule],
       controllers: [AppController],
       providers: [AppService],
     };
