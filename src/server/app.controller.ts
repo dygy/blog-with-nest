@@ -14,6 +14,12 @@ export class AppController {
     return {};
   }
 
+  @Get('/add')
+  @Render('write')
+  public add() {
+    return {};
+  }
+
   @Get(':id')
   @Render('[id]')
   @UseInterceptors(ParamsInterceptor, ConfigInterceptor)

@@ -5,7 +5,7 @@ import { fetch } from 'src/shared/utils/fetch';
 import { useMemo } from 'react';
 import Background from '../client/components/Background/Background';
 
-declare type blogProps = {
+declare type props = {
   post: Blog;
 };
 
@@ -13,7 +13,7 @@ declare type blogQuery = {
   id: string;
 };
 
-const Id = ({ post }: blogProps) => {
+const Id = ({ post }: props) => {
   const title = useMemo(() => {
     if (post._id === 0) {
       return <h1>{post.name} 404</h1>;
@@ -35,7 +35,7 @@ const errorBlog: Blog = {
   text: 'we have the error here',
   date: new Date(),
 };
-export const getServerSideProps = buildServerSideProps<blogProps, blogQuery>(
+export const getServerSideProps = buildServerSideProps<props, blogQuery>(
   async (ctx) => {
     let ID = ctx.query.id;
 

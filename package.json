@@ -24,6 +24,7 @@
     "lint": "eslint \"{src,apps,libs,test}/**/*.tsx?\" --fix"
   },
   "dependencies": {
+    "@emotion/css": "^11.10.5",
     "@nestjs/common": "^8.0.0",
     "@nestjs/core": "^8.0.0",
     "@nestjs/mongoose": "^9.2.1",
@@ -38,7 +39,10 @@
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
     "rxjs": "^7.2.0",
-    "sass": "^1.57.1"
+    "sass": "^1.57.1",
+    "slate": "^0.88.1",
+    "slate-history": "^0.86.0",
+    "slate-react": "^0.88.2"
   },
   "devDependencies": {
     "@nestjs/cli": "^8.0.0",

@@ -1,15 +1,20 @@
 import { useCallback, useContext } from 'react';
+import { useRouter } from 'next/router';
 import classNames from 'classnames';
 
 import { ThemeContext } from '../../context/theme-context';
 
 import style from './Header.module.scss';
+import AwesomeButton from '../AwesomeButton/AwesomeButton';
+import Switch from '../Switch/Switch';
 
 declare type props = {
   isLoading: boolean;
 };
+
 const Header = ({ isLoading }: props) => {
   const { theme, setTheme } = useContext(ThemeContext);
+  const router = useRouter();
 
   const handleThemeChange = useCallback(() => {
     const isCurrentDark = theme === 'dark';
@@ -28,23 +33,23 @@ const Header = ({ isLoading }: props) => {
           <span>Header</span>
         </a>
         <div className={style.toggleBtnSection}>
+          {router.asPath !== '/add' && (
+            <AwesomeButton
+              onClick={() => {
+                router.push('/add');
+              }}
+              label={'+'}
+            />
+          )}
           {!isLoading && (
-            <div
-              className={classNames(style.toggleCheckbox, 'm-vertical-auto')}
-            >
-              <input
-                className={style.toggleBtnInput}
-                type="checkbox"
-                name="checkbox"
-                onChange={handleThemeChange}
-                checked={theme === 'light'}
-              />
-              <button
-                type="button"
-                className={style.toggleBtnInputLabel}
-                onClick={handleThemeChange}
-              ></button>
-            </div>
+            <Switch
+              checked={theme === 'light'}
+              onChange={handleThemeChange}
+              wrapperClassnames={classNames(
+                style.toggleCheckbox,
+                'm-vertical-auto',
+              )}
+            />
           )}
         </div>
       </div>

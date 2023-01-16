@@ -22,7 +22,7 @@ const Home = ({ blogPosts }: homeProps) => {
               <span>
                 {id + 1}. {name}{' '}
               </span>
-              <Link href={`/${_id}`}>Link</Link>
+              <Link href={`/${_id}`}>{'-> read'}</Link>
             </>
           ) : (
             <Link href={`/${_id}`}>{name}</Link>

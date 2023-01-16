@@ -4,10 +4,10 @@ import Header from '../Header/Header';
 import { ThemeContext } from '../../context/theme-context';
 import Footer from '../Footer/Footer';
 
-declare type backgroundProps = {
+declare type props = {
   children: React.ReactNode;
 };
-export default ({ children }: backgroundProps) => {
+export default ({ children }: props) => {
   const [isLoading, setLoading] = useState(true);
   const isBrowserDefaultDark = useCallback(() => {
     if (typeof window !== 'undefined') {

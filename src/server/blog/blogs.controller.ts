@@ -11,15 +11,20 @@ import { RolesGuard } from '../common/guards/roles.guard';
 import { BlogService } from './blogs.service';
 import { CreateBlogDto } from './create-blog.dto';
 import { NODE_ENV } from '../../shared/constants/env';
+import { Descendant } from 'slate';
 
 @UseGuards(RolesGuard)
 @Controller('blogs')
 export class BlogController {
   constructor(private readonly blogService: BlogService) {}
 
-  @Post()
-  async create(@Body() createBlogDto: CreateBlogDto) {
-    await this.blogService.create(createBlogDto);
+  @Post('/write')
+  public async write(@Body() body: { name: string; text: Descendant[] }) {
+    return await this.blogService.create({
+      text: JSON.stringify(body.text),
+      date: new Date(),
+      name: body.name,
+    } as unknown as CreateBlogDto);
   }
 
   @Get('/blog-posts')
