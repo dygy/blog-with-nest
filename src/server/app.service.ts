@@ -1,5 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { from, of, toArray } from 'rxjs';
+import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class AppService {}
