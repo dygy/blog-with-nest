@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment */
-
 import React, { useCallback, useMemo, useRef } from 'react';
 import isHotkey, { KeyboardEventLike } from 'is-hotkey';
 import { Editable, withReact, useSlate, Slate } from 'slate-react';
@@ -10,14 +8,14 @@ import {
   Descendant,
   Element as SlateElement,
   BaseEditor,
+  BaseElement,
 } from 'slate';
 import { withHistory } from 'slate-history';
 
-import { Button, Icon, Toolbar } from '../client/components/state/components';
-import { Property } from 'csstype';
-import TextAlign = Property.TextAlign;
+import { Button, Icon, Toolbar } from '../client/components/slate/components';
 import Background from '../client/components/Background/Background';
 import AwesomeButton from '../client/components/AwesomeButton/AwesomeButton';
+import { blogAlign, blogPart } from '../shared/types/blog-post';
 
 enum HOTKEYS {
   'mod+b' = 'bold',
@@ -30,10 +28,11 @@ const LIST_TYPES = ['numbered-list', 'bulleted-list'];
 const TEXT_ALIGN_TYPES = ['left', 'center', 'right', 'justify'];
 
 const write = () => {
-  const renderElement = useCallback((props) => <Element {...props} />, []);
-  const renderLeaf = useCallback((props) => <Leaf {...props} />, []);
-  const editor = useMemo(() => withHistory(withReact(createEditor())), []);
-  const ref = useRef();
+  const renderElement = useCallback((props) => <Element {...props} />, []),
+    renderLeaf = useCallback((props) => <Leaf {...props} />, []),
+    editor = useMemo(() => withHistory(withReact(createEditor())), []),
+    ref: React.MutableRefObject<HTMLInputElement | undefined> = useRef();
+
   return (
     <Background>
       <link
@@ -43,7 +42,7 @@ const write = () => {
       <h1>Write new post down there</h1>
       <p>
         <input
-          ref={ref as unknown as React.LegacyRef<HTMLInputElement>}
+          ref={ref as React.MutableRefObject<HTMLInputElement>}
           placeholder={'name of post'}
         />
       </p>
@@ -95,7 +94,6 @@ const write = () => {
               redirect: 'follow',
               referrerPolicy: 'no-referrer',
               body: JSON.stringify({
-                // @ts-ignore
                 name: ref.current?.value || '',
                 text: editor.children,
               }),
@@ -121,26 +119,27 @@ const toggleBlock = (editor: BaseEditor, format: string) => {
   const isList = LIST_TYPES.includes(format);
 
   Transforms.unwrapNodes(editor, {
-    match: (n) =>
-      !Editor.isEditor(n) &&
-      SlateElement.isElement(n) && // @ts-ignore
-      LIST_TYPES.includes(n.type) &&
+    match: (node) =>
+      !Editor.isEditor(node) &&
+      SlateElement.isElement(node) &&
+      LIST_TYPES.includes((node as blogPart).type as string) &&
       !TEXT_ALIGN_TYPES.includes(format),
     split: true,
   });
-  let newProperties: Partial<SlateElement>;
+  let newProperties: blogPart;
   if (TEXT_ALIGN_TYPES.includes(format)) {
     newProperties = {
-      // @ts-ignore
-      align: isActive ? undefined : format,
+      align: isActive ? undefined : (format as blogAlign),
     };
   } else {
     newProperties = {
-      // @ts-ignore
       type: isActive ? 'paragraph' : isList ? 'list-item' : format,
     };
   }
-  Transforms.setNodes<SlateElement>(editor, newProperties);
+  Transforms.setNodes<SlateElement>(
+    editor,
+    newProperties as Partial<BaseElement>,
+  );
 
   if (!isActive && isList) {
     const block = { type: format, children: [] };
@@ -183,10 +182,7 @@ const isMarkActive = (editor: BaseEditor, format: string | number) => {
 declare type elementProps = {
   attributes: React.HTMLAttributes<any>;
   children: React.ReactElement;
-  element: {
-    type: string;
-    align: TextAlign | undefined;
-  };
+  element: blogPart;
 };
 
 const Element = ({ attributes, children, element }: elementProps) => {
@@ -241,14 +237,14 @@ declare type leafProps = {
   attributes: React.HTMLAttributes<any>;
   children: React.ReactElement;
   leaf: {
-    bold: string;
-    code: string;
-    underline: string;
-    italic: string;
+    bold: boolean;
+    code: boolean;
+    underline: boolean;
+    italic: boolean;
   };
 };
 
-const Leaf = ({ attributes, children, leaf }: leafProps) => {
+export const Leaf = ({ attributes, children, leaf }: leafProps) => {
   if (leaf.bold) {
     children = <strong>{children}</strong>;
   }
@@ -307,7 +303,7 @@ const MarkButton = ({ format, icon }: buttonProps) => {
   );
 };
 
-const initialValue: unknown[] = [
+const initialValue: blogPart[] = [
   {
     type: 'paragraph',
     children: [

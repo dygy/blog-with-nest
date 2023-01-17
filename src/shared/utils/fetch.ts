@@ -26,7 +26,7 @@ const envAwareFetch = (url: string, options?: Partial<RequestInit>) => {
   return fetch(fetchUrl, options)
     .then((res) => res.json())
     .catch((err) => {
-      console.log(err);
+      // console.log(err);
     });
 };
 

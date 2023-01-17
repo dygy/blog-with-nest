@@ -1,7 +1,10 @@
 import { createContext } from 'react';
 
-export const ThemeContext = createContext({
+declare type contextType = {
+  theme: string;
+  setTheme: (theme: string) => void;
+};
+export const ThemeContext = createContext<contextType>({
   theme: '',
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
   setTheme: (theme: string) => {},
 });

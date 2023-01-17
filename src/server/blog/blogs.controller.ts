@@ -10,8 +10,7 @@ import {
 import { RolesGuard } from '../common/guards/roles.guard';
 import { BlogService } from './blogs.service';
 import { CreateBlogDto } from './create-blog.dto';
-import { NODE_ENV } from '../../shared/constants/env';
-import { Descendant } from 'slate';
+import { blogPart } from '../../shared/types/blog-post';
 
 @UseGuards(RolesGuard)
 @Controller('blogs')
@@ -19,7 +18,7 @@ export class BlogController {
   constructor(private readonly blogService: BlogService) {}
 
   @Post('/write')
-  public async write(@Body() body: { name: string; text: Descendant[] }) {
+  public async write(@Body() body: { name: string; text: blogPart[] }) {
     return await this.blogService.create({
       text: JSON.stringify(body.text),
       date: new Date(),
@@ -31,24 +30,12 @@ export class BlogController {
   public async findAll() {
     const res = await this.blogService.findAll();
 
-    if (NODE_ENV === 'development' && (res === undefined || res.length === 0)) {
-      await this.blogService.create({
-        name: 'hello world',
-        date: new Date(),
-        text: 'dance wit the devil',
-      } as unknown as CreateBlogDto);
-      await this.blogService.create({
-        name: "world don't deserve me",
-        date: new Date(),
-        text: 'goodbye the world',
-      } as unknown as CreateBlogDto);
-      return await this.blogService.findAll();
-    }
     return res || [];
   }
 
   @Get('/blog-posts/:id')
   public async findOne(@Param('id') id: string) {
+    console.log(await this.blogService.findOne(id));
     return await this.blogService.findOne(id);
   }
 

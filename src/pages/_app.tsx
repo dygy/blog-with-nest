@@ -4,17 +4,21 @@ import { AppData } from 'src/shared/types/app-data';
 import { initializeFetch } from 'src/shared/utils/fetch';
 import React from 'react';
 import '../global.scss';
+
+type pagePropType = {
+  appData: AppData;
+};
 class App extends NextApp<AppProps> {
   appData: AppData;
 
   constructor(props: AppProps) {
     super(props);
-
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    this.appData = props.pageProps.appData || {};
+    this.appData = (props.pageProps as pagePropType).appData || {};
 
     initializeFetch(this.appData.basePath);
+
+    if ('appData' in props.pageProps) {
+    }
   }
 
   render() {
