@@ -44,16 +44,6 @@
   }
 }
 
-.toggleBtnInput:checked ~ .toggleBtnTheme {
-  &:after {
-    // theme switch circle background in light theme
-    background: #fff;
-    left: calc(100% - 3px);
-    transform: translateX(-100%);
-  }
-}
-
-
 .toggleBtnInput:checked ~ .toggleBtnInputLabel {
   background-color: #82deff;
 }

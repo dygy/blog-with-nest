@@ -16,6 +16,44 @@ import { Button, Icon, Toolbar } from '../client/components/slate/components';
 import Background from '../client/components/Background/Background';
 import AwesomeButton from '../client/components/AwesomeButton/AwesomeButton';
 import { blogAlign, blogPart } from '../shared/types/blog-post';
+import AwesomeInput from '../client/components/AwesomeInput/AwesomeInput';
+
+declare type elementProps = {
+  attributes: React.HTMLAttributes<any>;
+  children: React.ReactElement;
+  element: blogPart;
+};
+
+declare type leafProps = {
+  attributes: React.HTMLAttributes<any>;
+  children: React.ReactElement;
+  leaf: {
+    bold: boolean;
+    code: boolean;
+    underline: boolean;
+    italic: boolean;
+  };
+};
+
+declare type buttonProps = {
+  format: string;
+  icon: string;
+};
+
+const initialValue: blogPart[] = [
+  {
+    type: 'paragraph',
+    children: [
+      { text: 'This is editable ' },
+      { text: 'rich', bold: true },
+      { text: ' text, ' },
+      { text: 'much', italic: true },
+      { text: ' better than a ' },
+      { text: '<textarea>', code: true },
+      { text: '!' },
+    ],
+  },
+];
 
 enum HOTKEYS {
   'mod+b' = 'bold',
@@ -26,89 +64,6 @@ enum HOTKEYS {
 
 const LIST_TYPES = ['numbered-list', 'bulleted-list'];
 const TEXT_ALIGN_TYPES = ['left', 'center', 'right', 'justify'];
-
-const write = () => {
-  const renderElement = useCallback((props) => <Element {...props} />, []),
-    renderLeaf = useCallback((props) => <Leaf {...props} />, []),
-    editor = useMemo(() => withHistory(withReact(createEditor())), []),
-    ref: React.MutableRefObject<HTMLInputElement | undefined> = useRef();
-
-  return (
-    <Background>
-      <link
-        rel="stylesheet"
-        href="https://fonts.googleapis.com/icon?family=Material+Icons"
-      />
-      <h1>Write new post down there</h1>
-      <p>
-        <input
-          ref={ref as React.MutableRefObject<HTMLInputElement>}
-          placeholder={'name of post'}
-        />
-      </p>
-      <Slate editor={editor} value={initialValue as Descendant[]}>
-        <Toolbar>
-          <MarkButton format="bold" icon="format_bold" />
-          <MarkButton format="italic" icon="format_italic" />
-          <MarkButton format="underline" icon="format_underlined" />
-          <MarkButton format="code" icon="code" />
-          <BlockButton format="heading-one" icon="looks_one" />
-          <BlockButton format="heading-two" icon="looks_two" />
-          <BlockButton format="block-quote" icon="format_quote" />
-          <BlockButton format="numbered-list" icon="format_list_numbered" />
-          <BlockButton format="bulleted-list" icon="format_list_bulleted" />
-          <BlockButton format="left" icon="format_align_left" />
-          <BlockButton format="center" icon="format_align_center" />
-          <BlockButton format="right" icon="format_align_right" />
-          <BlockButton format="justify" icon="format_align_justify" />
-        </Toolbar>
-        <Editable
-          renderElement={renderElement}
-          renderLeaf={renderLeaf}
-          placeholder="Enter some rich text…"
-          spellCheck
-          autoFocus
-          onKeyDown={(event) => {
-            for (const hotkey in HOTKEYS) {
-              if (isHotkey(hotkey, event as KeyboardEventLike)) {
-                event.preventDefault();
-                const mark = HOTKEYS[hotkey as keyof unknown];
-                toggleMark(editor, mark);
-              }
-            }
-          }}
-        />
-      </Slate>
-      <div>
-        <AwesomeButton
-          label={'Save'}
-          onClick={() => {
-            fetch('/blogs/write', {
-              method: 'POST',
-              mode: 'cors',
-              cache: 'no-cache',
-              credentials: 'same-origin',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              redirect: 'follow',
-              referrerPolicy: 'no-referrer',
-              body: JSON.stringify({
-                name: ref.current?.value || '',
-                text: editor.children,
-              }),
-            })
-              .then(() => {
-                alert('saved');
-                location.href = '/';
-              })
-              .catch(() => alert('error'));
-          }}
-        />
-      </div>
-    </Background>
-  );
-};
 
 const toggleBlock = (editor: BaseEditor, format: string) => {
   const isActive = isBlockActive(
@@ -179,12 +134,6 @@ const isMarkActive = (editor: BaseEditor, format: string | number) => {
   return marks ? marks[format as keyof unknown] === true : false;
 };
 
-declare type elementProps = {
-  attributes: React.HTMLAttributes<any>;
-  children: React.ReactElement;
-  element: blogPart;
-};
-
 const Element = ({ attributes, children, element }: elementProps) => {
   const style = { textAlign: element.align };
   switch (element.type) {
@@ -233,17 +182,6 @@ const Element = ({ attributes, children, element }: elementProps) => {
   }
 };
 
-declare type leafProps = {
-  attributes: React.HTMLAttributes<any>;
-  children: React.ReactElement;
-  leaf: {
-    bold: boolean;
-    code: boolean;
-    underline: boolean;
-    italic: boolean;
-  };
-};
-
 export const Leaf = ({ attributes, children, leaf }: leafProps) => {
   if (leaf.bold) {
     children = <strong>{children}</strong>;
@@ -283,11 +221,6 @@ const BlockButton = ({ format, icon }: buttonProps) => {
   );
 };
 
-declare type buttonProps = {
-  format: string;
-  icon: string;
-};
-
 const MarkButton = ({ format, icon }: buttonProps) => {
   const editor = useSlate();
   return (
@@ -303,19 +236,83 @@ const MarkButton = ({ format, icon }: buttonProps) => {
   );
 };
 
-const initialValue: blogPart[] = [
-  {
-    type: 'paragraph',
-    children: [
-      { text: 'This is editable ' },
-      { text: 'rich', bold: true },
-      { text: ' text, ' },
-      { text: 'much', italic: true },
-      { text: ' better than a ' },
-      { text: '<textarea>', code: true },
-      { text: '!' },
-    ],
-  },
-];
+const write = () => {
+  const renderElement = useCallback((props) => <Element {...props} />, []),
+    renderLeaf = useCallback((props) => <Leaf {...props} />, []),
+    editor = useMemo(() => withHistory(withReact(createEditor())), []),
+    ref: React.MutableRefObject<HTMLInputElement | undefined> = useRef(),
+    submit = useCallback(() => {
+      fetch('/blogs/write', {
+        method: 'POST',
+        mode: 'cors',
+        cache: 'no-cache',
+        credentials: 'same-origin',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        redirect: 'follow',
+        referrerPolicy: 'no-referrer',
+        body: JSON.stringify({
+          name: ref.current?.value || '',
+          text: editor.children,
+        }),
+      })
+        .then(() => {
+          alert('saved');
+          location.href = '/';
+        })
+        .catch(() => alert('error'));
+    }, [editor.children, ref.current?.value]);
+
+  return (
+    <Background>
+      <link
+        rel="stylesheet"
+        href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      />
+      <h1>Write new post down there</h1>
+      <p>
+        <AwesomeInput ref={ref} placeholder={'post name'} />
+      </p>
+      <br />
+      <Slate editor={editor} value={initialValue as Descendant[]}>
+        <Toolbar>
+          <MarkButton format="bold" icon="format_bold" />
+          <MarkButton format="italic" icon="format_italic" />
+          <MarkButton format="underline" icon="format_underlined" />
+          <MarkButton format="code" icon="code" />
+          <BlockButton format="heading-one" icon="looks_one" />
+          <BlockButton format="heading-two" icon="looks_two" />
+          <BlockButton format="block-quote" icon="format_quote" />
+          <BlockButton format="numbered-list" icon="format_list_numbered" />
+          <BlockButton format="bulleted-list" icon="format_list_bulleted" />
+          <BlockButton format="left" icon="format_align_left" />
+          <BlockButton format="center" icon="format_align_center" />
+          <BlockButton format="right" icon="format_align_right" />
+          <BlockButton format="justify" icon="format_align_justify" />
+        </Toolbar>
+        <Editable
+          renderElement={renderElement}
+          renderLeaf={renderLeaf}
+          placeholder="Enter some rich text…"
+          spellCheck
+          autoFocus
+          onKeyDown={(event) => {
+            for (const hotkey in HOTKEYS) {
+              if (isHotkey(hotkey, event as KeyboardEventLike)) {
+                event.preventDefault();
+                const mark = HOTKEYS[hotkey as keyof unknown];
+                toggleMark(editor, mark);
+              }
+            }
+          }}
+        />
+      </Slate>
+      <div>
+        <AwesomeButton label={'Save'} onClick={submit} />
+      </div>
+    </Background>
+  );
+};
 
 export default write;

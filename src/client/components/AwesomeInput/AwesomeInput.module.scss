@@ -1,0 +1,13 @@
+@import '../../../theme-variables.scss';
+
+.input {
+  @include themify {
+    border: 3px solid themed('textColor');
+    color: themed('textColor');
+  }
+  font-size: 30px;
+  background: transparent;
+  padding: 5px;
+  margin-top: 5px;
+  transition: all 500ms;
+}
